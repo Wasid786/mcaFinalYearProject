@@ -49,8 +49,20 @@ class Student:
               bg="white", fg="blue").place(x=0, y=0, width=self.screen_width, height=50)
 
 
+# margins
+        margin_x = int(self.screen_width * 0.01)   # 1% side margin
+        margin_y = int(self.screen_height * 0.02)  # 2% top margin
+
+        main_width = self.screen_width - (2 * margin_x)
+        main_height = bg_height - (2 * margin_y) - 50   # minus title height
+
         main_frame = Frame(bg_img, bd=2, bg="white")
-        main_frame.place(x=20, y=50, width=1480, height=600 )
+        main_frame.place(
+          x=margin_x,
+          y=50 + margin_y,
+          width=main_width,
+          height=main_height
+          )
 
         # /////  left label frame   ////////////////
 
