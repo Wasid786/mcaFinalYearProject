@@ -3,7 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from turtle import bgcolor
 from PIL import Image, ImageTk
-from numpy import imag
+from matplotlib import widgets
+from numpy import imag, save
 from pyparsing import col
 
 class Student:
@@ -150,20 +151,187 @@ class Student:
         sem_combo["values"] = ("Select Semester", "Sem 1", "Sem 2", "Sem 3", "Sem 4")
         sem_combo.current(0)
         sem_combo.grid(row=1, column=3, padx=10, pady=10, sticky=W)
+
+        # //// class student info/////
+        class_Student_frame = LabelFrame(
+          Left_frame, bd=2, relief=RIDGE, text="Class Student Info",
+          font=("times new roman", 15, "bold"),
+          bg="white", fg="red"
+        )
+        class_Student_frame.place(x=5, y=250, width=720, height=300) 
+
+        studentId_label = Label(
+          class_Student_frame,
+          text="Student ID: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        studentId_label.grid(row=0, column=0, padx=10, pady=10, sticky=W)    
+   
+        # student id 
+        studentId_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        studentId_entry.grid(row=0, column=1, padx=10, pady=10, sticky=W)    
+
+
+
+        studentName_label = Label(
+          class_Student_frame,
+          text="Student Name: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        studentName_label.grid(row=0, column=2, padx=10, pady=10, sticky=W)    
+        # student id 
+        studentName_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        studentName_entry.grid(row=0, column=3, padx=10, pady=10, sticky=W)    
+
+
+        class_div_label = Label(
+          class_Student_frame,
+          text="Class Div: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        class_div_label.grid(row=1, column=0, padx=10, pady=10, sticky=W)     
+        # student id 
+        class_div_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        class_div_entry.grid(row=1, column=1, padx=10, pady=10, sticky=W)   
+
+
+
+        roll_no_label = Label(
+          class_Student_frame,
+          text="Roll No: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        roll_no_label.grid(row=1, column=2, padx=10, pady=10, sticky=W)     
+        # student id 
+        roll_no_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        roll_no_entry.grid(row=1, column=3, padx=10, pady=10, sticky=W) 
+
+
+
+        gender_label = Label(
+          class_Student_frame,
+          text="Gender ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        gender_label.grid(row=2, column=0, padx=10, pady=10, sticky=W)     
+        # student id 
+        gender_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        gender_entry.grid(row=2, column=1, padx=10, pady=10, sticky=W) 
+
+
+
+        dob_label = Label(
+          class_Student_frame,
+          text="DOB ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        dob_label.grid(row=2, column=2, padx=10, pady=10, sticky=W)     
+        # student id 
+        dob_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        dob_entry.grid(row=2, column=3, padx=10, pady=10, sticky=W) 
+
+
+
+
+        email_label = Label(
+          class_Student_frame,
+          text="Email:  ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        email_label.grid(row=3, column=0, padx=10, pady=10, sticky=W)     
+        # student id 
+        email_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        email_entry.grid(row=3, column=1, padx=10, pady=10, sticky=W) 
+
+
+
+        phone_label = Label(
+          class_Student_frame,
+          text="Phone: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        phone_label.grid(row=3, column=2, padx=10, pady=10, sticky=W)     
+        # student id 
+        phone_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        phone_entry.grid(row=3, column=3, padx=10, pady=10, sticky=W) 
+
+
+
+
+
+        address_label = Label(
+          class_Student_frame,
+          text="address: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        address_label.grid(row=4, column=0, padx=10, pady=10, sticky=W)     
+        # student id 
+        address_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        address_entry.grid(row=4, column=1, padx=10, pady=10, sticky=W) 
+
+
+
+        teacher_label = Label(
+          class_Student_frame,
+          text="Teacher: ",
+          font=("times new roman", 12, "bold"),
+          bg="white"
+        )
+        teacher_label.grid(row=4, column=2, padx=10, pady=10, sticky=W)     
+        # student id 
+        teacher_entry = ttk.Entry(class_Student_frame, width=20, font=("times new roman",13, "bold"))
+        teacher_entry.grid(row=4, column=3, padx=10, pady=10, sticky=W) 
+
+
+        # ///  radio button //
+        radioBtn1 = ttk.Radiobutton(class_Student_frame, text="Take photo Sample", value="Yes", )
+        radioBtn1.grid(row=5, column=0, )
+
+
+                # ///  radio button //
+        radioBtn2 = ttk.Radiobutton(class_Student_frame, text="No photo Sample", value="Yes", )
+        radioBtn2.grid(row=6, column=0, )
+
+
+        # ////button frame ///?
+        btn_frame = Frame(class_Student_frame, bd=2, relief=RIDGE, bg="white")
+        btn_frame.place(x=0,y=200, width=715, height=35)
+
+
+        save_btn= Button(btn_frame, text="Save", width=17,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        save_btn.grid(row=0, column=0, )
+
+        update_btn= Button(btn_frame, text="Update", width=17,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        update_btn.grid(row=0, column=1, )
+
+        delete_btn= Button(btn_frame, text="Delete", width=17,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        delete_btn.grid(row=0, column=2, )
         
-        
+        reset_btn= Button(btn_frame, text="Reset", width=17,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        reset_btn.grid(row=0, column=3, )
 
 
 
 
 
+        # ////button frame2 ///?
+        btn_frame2 = Frame(class_Student_frame, bd=2, relief=RIDGE, bg="white")
+        btn_frame2.place(x=0,y=230, width=715, height=35)
 
+        take_photo_btn = Button(btn_frame2, text="Take Photo Sample", width=35,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        take_photo_btn.grid(row=0, column=0, )
 
-
-
-
-
-
+        update_photo_btn = Button(btn_frame2, text="Update Photo Sample", width=35,  font=("times new roman",13, "bold"), bg="blue", fg="white")
+        update_photo_btn.grid(row=0, column=1 )
 
 
         # /////  right label frame   ////////////////
