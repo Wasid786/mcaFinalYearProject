@@ -1,10 +1,15 @@
 from tkinter import *
 from PIL import Image, ImageTk
+from student import Student
 
 class Face_recognition_System:
     def __init__(self, root):
         self.root = root
         self.images = []  # store all images
+
+                # //////////////////// function button ///////////
+
+
 
         # Get screen size dynamically
         self.screen_width = self.root.winfo_screenwidth()
@@ -57,21 +62,21 @@ class Face_recognition_System:
         y_top = int(self.screen_height * 0.2)
         y_bottom = int(self.screen_height * 0.55)
 
-        def create_button(img_path, text, x, y):
+        def create_button(img_path, text, x, y, command=lambda: None):
            img = load_image(img_path, btn_w, btn_h)
            self.images.append(img) 
 
-           btn = Button(bg_img, image=img, cursor="hand2")
+           btn = Button(bg_img, image=img  ,cursor="hand2", command=command)
            btn.place(x=x, y=y, width=btn_w, height=btn_h)
 
-           Button(bg_img, text=text, cursor="hand2",
+           Button(bg_img, text=text, cursor="hand2", command=command,
            font=("times new roman", 14, "bold"),
            bg="darkblue", fg="white").place(
           x=x, y=y + btn_h, width=btn_w, height=40
     )
 
         # Row 1
-        create_button(r"D:\Projects\mcaProject\static\images\img05.jpg", "Student Details", x_positions[0], y_top)
+        create_button(r"D:\Projects\mcaProject\static\images\img05.jpg", "Student Details", x_positions[0], y_top, command=self.student_details)
         create_button(r"D:\Projects\mcaProject\static\images\img06.jpg", "Face Detection", x_positions[1], y_top)
         create_button(r"D:\Projects\mcaProject\static\images\img07.png", "Attendance", x_positions[2], y_top)
         create_button(r"D:\Projects\mcaProject\static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
@@ -81,6 +86,28 @@ class Face_recognition_System:
         create_button(r"D:\Projects\mcaProject\static\images\img10.jpg", "Photos", x_positions[1], y_bottom)
         create_button(r"D:\Projects\mcaProject\static\images\img11.png", "Developer", x_positions[2], y_bottom)
         create_button(r"D:\Projects\mcaProject\static\images\img12.jpg", "Exit", x_positions[3], y_bottom)
+
+    
+    def student_details(self):
+        self.new_window = Toplevel(self.root)
+        self.app = Student(self.new_window)
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

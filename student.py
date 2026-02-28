@@ -1,16 +1,37 @@
+from multiprocessing import parent_process
 import secrets
 from tkinter import *
 from tkinter import ttk
+from tokenize import String
 from PIL import Image, ImageTk
+from tkinter import messagebox
+import mysql.connector
 
 class Student:
     def __init__(self, root):
         self.root = root
-
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
         self.root.title("Student Info Page")
+
+
+        # //////////////////// variables for data sending at database /////////
+        self.var_dep = StringVar()
+        self.var_course = StringVar()
+        self.var_year = StringVar()
+        self.var_semester  = StringVar()
+        self.var_std_id = StringVar()
+        self.var_std_name = StringVar()
+        self.var_div= StringVar() 
+        self.var_roll= StringVar()
+        self.var_gender= StringVar()
+        self.var_dob  = StringVar()
+        self.var_email = StringVar()
+        self.var_phone  = StringVar()
+        self.var_address   = StringVar()
+        self.var_teacher    = StringVar()
+
 
         header_height = int(self.screen_height * 0.15)
         header_width = int(self.screen_width / 3)
@@ -85,28 +106,28 @@ class Student:
 
         dep_label = Label(current_course_frame, text="Department", font=("times new roman", 12, "bold"), bg="white")
         dep_label.grid(row=0, column=0, padx=10, pady=10, sticky=W)
-        dep_combo = ttk.Combobox(current_course_frame, font=("times new roman", 12, "bold"), state="readonly", width=17)
+        dep_combo = ttk.Combobox(current_course_frame,textvariable=self.var_dep, font=("times new roman", 12, "bold"), state="readonly", width=17)
         dep_combo["values"] = ("Select Department", "BCA", "MCA", "Cyber Security")
         dep_combo.current(0)
         dep_combo.grid(row=0, column=1, padx=10, pady=10, sticky=W)
 
         course_label = Label(current_course_frame, text="Course", font=("times new roman", 12, "bold"), bg="white")
         course_label.grid(row=0, column=2, padx=10, pady=10, sticky=W)
-        course_combo = ttk.Combobox(current_course_frame, font=("times new roman", 12, "bold"), state="readonly", width=17)
+        course_combo = ttk.Combobox(current_course_frame,textvariable=self.var_course, font=("times new roman", 12, "bold"), state="readonly", width=17)
         course_combo["values"] = ("Select Course", "FY", "SY", "TY")
         course_combo.current(0)
         course_combo.grid(row=0, column=3, padx=10, pady=10, sticky=W)
 
         date_label = Label(current_course_frame, text="Year", font=("times new roman", 12, "bold"), bg="white")
         date_label.grid(row=1, column=0, padx=10, pady=10, sticky=W)
-        year_combo = ttk.Combobox(current_course_frame, font=("times new roman", 12, "bold"), state="readonly", width=17)
+        year_combo = ttk.Combobox(current_course_frame,textvariable=self.var_year, font=("times new roman", 12, "bold"), state="readonly", width=17)
         year_combo["values"] = ("Select Year", "2022-23", "2023-24", "2024-25")
         year_combo.current(2)
         year_combo.grid(row=1, column=1, padx=10, pady=10, sticky=W)
 
         sem_label = Label(current_course_frame, text="Semester", font=("times new roman", 12, "bold"), bg="white")
         sem_label.grid(row=1, column=2, padx=10, pady=10, sticky=W)
-        sem_combo = ttk.Combobox(current_course_frame, font=("times new roman", 12, "bold"), state="readonly", width=17)
+        sem_combo = ttk.Combobox(current_course_frame,textvariable=self.var_semester, font=("times new roman", 12, "bold"), state="readonly", width=17)
         sem_combo["values"] = ("Select Semester", "Sem 1", "Sem 2", "Sem 3", "Sem 4")
         sem_combo.current(0)
         sem_combo.grid(row=1, column=3, padx=10, pady=10, sticky=W)
@@ -121,24 +142,35 @@ class Student:
         class_frame_h = left_height - class_frame_y - 10
         class_Student_frame.place(x=5, y=class_frame_y, width=left_width - 10, height=class_frame_h)
 
-        fields = [
-            ("Student ID:", 0, 0), ("Student Name:", 0, 2),
-            ("Class Div:", 1, 0),  ("Roll No:", 1, 2),
-            ("Gender:", 2, 0),     ("DOB:", 2, 2),
-            ("Email:", 3, 0),      ("Phone:", 3, 2),
-            ("Address:", 4, 0),    ("Teacher:", 4, 2),
-        ]
-        entries = {}
-        for (text, row, col) in fields:
-            Label(class_Student_frame, text=text, font=("times new roman", 12, "bold"), bg="white").grid(
-                row=row, column=col, padx=10, pady=10, sticky=W)
-            e = ttk.Entry(class_Student_frame, width=20, font=("times new roman", 13, "bold"))
-            e.grid(row=row, column=col + 1, padx=10, pady=10, sticky=W)
-            entries[text] = e
+# Class Student Info Frame fields - linked to StringVars
+        field_data = [
+    ("Student ID:",   self.var_std_id,   0, 0),
+    ("Student Name:", self.var_std_name, 0, 2),
+    ("Class Div:",    self.var_div,      1, 0),
+    ("Roll No:",      self.var_roll,     1, 2),
+    ("Gender:",       self.var_gender,   2, 0),
+    ("DOB:",          self.var_dob,      2, 2),
+    ("Email:",        self.var_email,    3, 0),
+    ("Phone:",        self.var_phone,    3, 2),
+    ("Address:",      self.var_address,  4, 0),
+    ("Teacher:",      self.var_teacher,  4, 2),
+]
 
-        radioBtn1 = ttk.Radiobutton(class_Student_frame, text="Take photo Sample", value="Yes")
+        for (text, var, row, col) in field_data:
+         Label(class_Student_frame, text=text,
+          font=("times new roman", 12, "bold"), bg="white").grid(
+          row=row, column=col, padx=10, pady=10, sticky=W)
+         ttk.Entry(class_Student_frame, textvariable=var,   # <-- linked here
+              width=20, font=("times new roman", 13, "bold")).grid(
+              row=row, column=col + 1, padx=10, pady=10, sticky=W)
+    
+        # ////// radio button ////
+        self.var_radio1 = StringVar()
+        radioBtn1 = ttk.Radiobutton(class_Student_frame,variable=self.var_radio1, text="Take photo Sample", value="Yes")
         radioBtn1.grid(row=5, column=0)
-        radioBtn2 = ttk.Radiobutton(class_Student_frame, text="No photo Sample", value="No")
+        
+
+        radioBtn2 = ttk.Radiobutton(class_Student_frame,variable=self.var_radio1, text="No photo Sample", value="No")
         radioBtn2.grid(row=6, column=0)
 
         # ---- Button Frame 1 (Save/Update/Delete/Reset) ----
@@ -149,7 +181,7 @@ class Student:
         for i in range(4):
             btn_frame.columnconfigure(i, weight=1)
 
-        Button(btn_frame, text="Save",   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
+        Button(btn_frame, text="Save",command=self.add_data,   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
         Button(btn_frame, text="Update", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
         Button(btn_frame, text="Delete", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
         Button(btn_frame, text="Reset",  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
@@ -235,6 +267,62 @@ class Student:
             self.student_table.column(col_id, width=120)
 
         self.student_table["show"] = "headings"
+
+
+    # ////////////////////   func for data adding /////////////////
+
+    def add_data(self):
+        try:
+            if self.var_dep.get() == "Select Department" or self.var_std_name.get() == "" or self.var_std_id.get() == "":   
+             messagebox.showerror("Error", "All Fields are required!", parent=self.root)
+            else:
+                conn = mysql.connector.connect( 
+                host="localhost",
+                user="root",
+                password="Wasid@5284mysql",
+                database="face_recognizer"
+            )
+                my_cursor = conn.cursor()
+                my_cursor.execute(
+                "insert into student values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                (
+                    self.var_dep.get(),
+                    self.var_course.get(),
+                    self.var_year.get(),
+                    self.var_semester.get(),
+                    int(self.var_std_id.get()),
+                    self.var_std_name.get(),
+                    self.var_div.get(),
+                    self.var_roll.get(),
+                    self.var_gender.get(),
+                    self.var_dob.get(),
+                    self.var_email.get(),
+                    self.var_phone.get(),
+                    self.var_address.get(),
+                    self.var_teacher.get(),
+                    self.var_radio1.get()
+                )
+            )
+    
+                conn.commit()
+                conn.close()
+    
+                messagebox.showinfo("Success", "Student details has been added Successfully", parent=self.root)
+    
+        except Exception as es:
+         messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+
+
+
+
+           
+
+
+        # for var in [self.var_std_id, self.var_std_name, self.var_div,
+        #         self.var_roll, self.var_gender, self.var_dob,
+        #         self.var_email, self.var_phone, self.var_address, self.var_teacher]:
+        #  var.set("")
+
 
 
 if __name__ == "__main__":
