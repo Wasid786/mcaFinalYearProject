@@ -158,12 +158,47 @@ class Student:
 ]
 
         for (text, var, row, col) in field_data:
-         Label(class_Student_frame, text=text,
-          font=("times new roman", 12, "bold"), bg="white").grid(
-          row=row, column=col, padx=10, pady=10, sticky=W)
-         ttk.Entry(class_Student_frame, textvariable=var,   # <-- linked here
-              width=20, font=("times new roman", 13, "bold")).grid(
-              row=row, column=col + 1, padx=10, pady=10, sticky=W)
+            Label(
+              class_Student_frame,
+              text=text,
+              font=("times new roman", 12, "bold"),
+              bg="white"
+             ).grid(row=row, column=col, padx=10, pady=10, sticky=W)
+
+    # 👇 condition for combobox
+            if text == "Gender:":
+                combo = ttk.Combobox(
+            class_Student_frame,
+            textvariable=var,
+            font=("times new roman", 12, "bold"),
+            state="readonly",
+            width=18
+        )
+                combo["values"] = ("Male", "Female", "Other")
+                combo.current(0)
+                combo.grid(row=row, column=col+1, padx=10, pady=10, sticky=W)
+
+
+            elif text == "Class Div:":
+                combo = ttk.Combobox(
+            class_Student_frame,
+            textvariable=var,
+            font=("times new roman", 12, "bold"),
+            state="readonly",
+            width=18
+        )
+                combo["values"] = ("A", "B", "C")
+                combo.current(0)
+                combo.grid(row=row, column=col+1, padx=10, pady=10, sticky=W)
+
+            else:
+             ttk.Entry(
+            class_Student_frame,
+            textvariable=var,
+            width=20,
+            font=("times new roman", 13, "bold")
+        ).grid(row=row, column=col+1, padx=10, pady=10, sticky=W)
+
     
         # ////// radio button ////
         self.var_radio1 = StringVar()
@@ -257,6 +292,8 @@ class Student:
         scroll_y.pack(side=RIGHT, fill=Y)
         self.student_table.pack(fill=BOTH, expand=1)
         self.fetch_data()
+        self.student_table.bind("<ButtonRelease>", self.get_cursor)
+
 
         headings = {
             "dep": "Department", "course": "Course", "year": "Year", "sem": "Semester",
@@ -339,6 +376,29 @@ class Student:
                 
         except:
             pass
+
+    
+    # ////////////// get cursor ////////
+    def get_cursor(self, event):
+        cursor_focus = self.student_table.focus()
+        content = self.student_table.item(cursor_focus)
+        data =content["values"]
+
+        self.var_dep.set(data[0])
+        self.var_course.set(data[1])
+        self.var_year.set(data[2])
+        self.var_semester.set(data[3])
+        self.var_std_id.set(data[4])
+        self.var_std_name.set(data[5])
+        self.var_div.set(data[6]) 
+        self.var_roll.set(data[7])
+        self.var_gender.set(data[8])
+        self.var_dob.set(data[9])
+        self.var_email.set(data[10])
+        self.var_phone.set(data[11])
+        self.var_address.set(data[12])
+        self.var_teacher.set(data[13])
+        self.var_radio1.set(data[14])
 
 
 
