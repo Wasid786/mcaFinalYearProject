@@ -218,7 +218,7 @@ class Student:
             btn_frame.columnconfigure(i, weight=1)
 
         Button(btn_frame, text="Save",command=self.add_data,   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
-        Button(btn_frame, text="Update", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
+        Button(btn_frame, text="Update",command=self.update_data, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
         Button(btn_frame, text="Delete", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
         Button(btn_frame, text="Reset",  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
 
@@ -370,12 +370,14 @@ class Student:
                     self.student_table.delete(*self.student_table.get_children())
                     for i in data:
                         self.student_table.insert("",END,values=tuple(i))
-                        conn.commit()
-                        self.fetch_data()
-                        conn.close()
+
                 
-        except:
-            pass
+        except Exception as es:
+            messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+
+        finally:
+            if conn:
+                conn.close()
 
     
     # ////////////// get cursor ////////
@@ -399,6 +401,57 @@ class Student:
         self.var_address.set(data[12])
         self.var_teacher.set(data[13])
         self.var_radio1.set(data[14])
+
+        # //// update func //////
+    def update_data(self):
+        try:
+            if self.var_dep.get() == "Select Department" or self.var_std_name.get() == "" or self.var_std_id.get() == "":   
+             messagebox.showerror("Error", "All Fields are required!", parent=self.root)
+            else:
+                Update= messagebox.askyesno("Update", "Do you Want to update this student details: ", parent=self.root)
+                if Update > 0:
+                    conn = mysql.connector.connect( 
+                host="localhost",
+                user="root",
+                password="Wasid@5284mysql",
+                database="face_recognizer"
+            )
+                    my_cursor = conn.cursor()
+                    my_cursor.execute(
+                "update student set dep=%s,course=%s,year=%s,semester=%s,name=%s,division=%s,roll=%s,gender=%s,dob=%s,email=%s,phone=%s,address=%s,teacher=%s,photo_sample = %s where student_id=%s",
+                (
+                    self.var_dep.get(),
+                    self.var_course.get(),
+                    self.var_year.get(),
+                    self.var_semester.get(),
+                    self.var_std_name.get(),
+                    self.var_div.get(),
+                    self.var_roll.get(),
+                    self.var_gender.get(),
+                    self.var_dob.get(),
+                    self.var_email.get(),
+                    self.var_phone.get(),
+                    self.var_address.get(),
+                    self.var_teacher.get(),
+                    self.var_radio1.get(),
+                    int(self.var_std_id.get())
+
+                ) )
+                else:
+                    if not Update:
+                        return
+                messagebox.showinfo("Success","Student data update successfully!",parent=self.root)
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                    
+        except Exception as es:
+         messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+        finally:
+            if conn:
+                conn.close()
+
+
 
 
 
