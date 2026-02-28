@@ -309,7 +309,7 @@ class Student:
         self.student_table["show"] = "headings"
 
 
-    # ////////////////////   func for data adding /////////////////
+    # ////////////////////   func for db connection /////////////////
 
     def get_connection(self):
         return mysql.connector.connect(
@@ -318,8 +318,10 @@ class Student:
         password="Wasid@5284mysql",
         database="face_recognizer"
     )
+    # ////////////////////   func for data adding /////////////////
+
+
     def add_data(self):
-        conn = None
         try:
             if self.var_dep.get() == "Select Department" or self.var_std_name.get() == "" or self.var_std_id.get() == "":   
              messagebox.showerror("Error", "All Fields are required!", parent=self.root)
@@ -348,7 +350,7 @@ class Student:
             )
     
                 conn.commit()
-    
+                self.fetch_data()
                 messagebox.showinfo("Success", "Student details has been added Successfully", parent=self.root)
     
         except Exception as es:
@@ -504,13 +506,6 @@ class Student:
 
 
 
-           
-
-    
-        # for var in [self.var_std_id, self.var_std_name, self.var_div,
-        #         self.var_roll, self.var_gender, self.var_dob,
-        #         self.var_email, self.var_phone, self.var_address, self.var_teacher]:
-        #  var.set("")
 
 
 
