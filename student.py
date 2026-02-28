@@ -8,6 +8,8 @@ from PIL import Image, ImageTk
 from tkinter import messagebox
 import mysql.connector
 from numpy import delete
+import cv2
+import os
 
 class Student:
     def __init__(self, root):
@@ -230,7 +232,7 @@ class Student:
         for i in range(2):
             btn_frame2.columnconfigure(i, weight=1)
 
-        Button(btn_frame2, text="Take Photo Sample",   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
+        Button(btn_frame2, text="Take Photo Sample",command=self.generate_dataset,   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
         Button(btn_frame2, text="Update Photo Sample", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
 
         # ===== RIGHT FRAME: starts at 50% and takes remaining half =====
@@ -501,7 +503,108 @@ class Student:
         self.var_teacher.set("")
         self.var_radio1.set("")
         self.var_std_id.set("")
-    
+
+
+
+    # ///////////// generate data set or take photo sample  func ////////
+    def generate_dataset(self):
+        try:
+            if self.var_dep.get() == "Select Department" or self.var_std_name.get() == "" or self.var_std_id.get() == "":
+                messagebox.showerror("Error", "All Fields are required!", parent=self.root)
+                return
+
+            conn = self.get_connection()
+            my_cursor = conn.cursor()
+
+        # ✅ Update student data
+            my_cursor.execute(
+                "UPDATE student SET dep=%s, course=%s, year=%s, semester=%s, name=%s, division=%s, roll=%s, gender=%s, dob=%s, email=%s, phone=%s, address=%s, teacher=%s, photo_sample=%s WHERE student_id=%s",
+                (
+                    self.var_dep.get(),
+                    self.var_course.get(),
+                    self.var_year.get(),
+                    self.var_semester.get(),
+                    self.var_std_name.get(),
+                    self.var_div.get(),
+                    self.var_roll.get(),
+                    self.var_gender.get(),
+                    self.var_dob.get(),
+                    self.var_email.get(),
+                    self.var_phone.get(),
+                    self.var_address.get(),
+                    self.var_teacher.get(),
+                    self.var_radio1.get(),
+                    int(self.var_std_id.get())
+                )
+            )
+
+            conn.commit()
+
+        # ✅ Load classifier correctly
+
+
+            haar_path = os.path.join(cv2.__path__[0], "data", "haarcascade_frontalface_default.xml")
+
+            face_classifier = cv2.CascadeClassifier(haar_path)
+            # face_classifier = cv2.CascadeClassifier(
+            #     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+            # )
+
+            def face_cropped(img):
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                faces = face_classifier.detectMultiScale(gray, 1.3, 5)
+
+                for (x, y, w, h) in faces:
+                    return img[y:y+h, x:x+w]
+
+                return None
+
+        # ✅ Start camera
+            cap = cv2.VideoCapture(0)
+            img_id = 0
+            user_id = self.var_std_id.get()
+
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+
+                face = face_cropped(frame)
+
+                if face is not None:
+                    img_id += 1
+
+                    face = cv2.resize(face, (450, 450))
+                    face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+
+                    file_path = f"data/user.{user_id}.{img_id}.jpg"
+                    cv2.imwrite(file_path, face)
+
+                    cv2.putText(face, str(img_id), (50, 50),
+                            cv2.FONT_HERSHEY_COMPLEX, 1, (0,255,0), 2)
+
+                    cv2.imshow("Cropped Face", face)
+
+                if cv2.waitKey(1) == 13 or img_id == 100:
+                    break
+
+            cap.release()
+            cv2.destroyAllWindows()
+
+            messagebox.showinfo("Success", "Dataset generated successfully!", parent=self.root)
+
+            self.fetch_data()
+            self.reset_data()
+
+        except Exception as es:
+            messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+
+        finally:
+            if conn:
+                conn.close()
+
+
+
 
 
 
