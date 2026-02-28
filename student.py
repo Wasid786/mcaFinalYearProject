@@ -6,6 +6,7 @@ from tokenize import String
 from PIL import Image, ImageTk
 from tkinter import messagebox
 import mysql.connector
+from numpy import delete
 
 class Student:
     def __init__(self, root):
@@ -255,6 +256,7 @@ class Student:
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
         self.student_table.pack(fill=BOTH, expand=1)
+        self.fetch_data()
 
         headings = {
             "dep": "Department", "course": "Course", "year": "Year", "sem": "Semester",
@@ -311,6 +313,33 @@ class Student:
     
         except Exception as es:
          messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+
+
+    # ///////////////// fetch data //////////
+
+    def fetch_data(self):
+        try:
+                conn = mysql.connector.connect( 
+                host="localhost",
+                user="root",
+                password="Wasid@5284mysql",
+                database="face_recognizer"
+            )
+                my_cursor = conn.cursor()
+                my_cursor.execute("select * from student")
+                data = my_cursor.fetchall()
+
+                if len(data) !=0:
+                    self.student_table.delete(*self.student_table.get_children())
+                    for i in data:
+                        self.student_table.insert("",END,values=tuple(i))
+                        conn.commit()
+                        self.fetch_data()
+                        conn.close()
+                
+        except:
+            pass
+
 
 
 
