@@ -3,6 +3,7 @@ import secrets
 from tkinter import *
 from tkinter import ttk
 from tokenize import String
+from typing import final
 from PIL import Image, ImageTk
 from tkinter import messagebox
 import mysql.connector
@@ -15,8 +16,7 @@ class Student:
         self.screen_height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
         self.root.title("Student Info Page")
-
-
+    
         # //////////////////// variables for data sending at database /////////
         self.var_dep = StringVar()
         self.var_course = StringVar()
@@ -36,6 +36,7 @@ class Student:
 
         header_height = int(self.screen_height * 0.15)
         header_width = int(self.screen_width / 3)
+    
 
         def load_image(path, w, h):
             img = Image.open(path)
@@ -219,8 +220,8 @@ class Student:
 
         Button(btn_frame, text="Save",command=self.add_data,   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
         Button(btn_frame, text="Update",command=self.update_data, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
-        Button(btn_frame, text="Delete", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
-        Button(btn_frame, text="Reset",  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
+        Button(btn_frame, text="Delete",command=self.delete_data, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
+        Button(btn_frame, text="Reset",command=self.reset_data,  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
 
         # ---- Button Frame 2 (Photo buttons) ----
         btn_frame2 = Frame(class_Student_frame, bd=2, relief=RIDGE, bg="white")
@@ -310,18 +311,21 @@ class Student:
 
     # ////////////////////   func for data adding /////////////////
 
+    def get_connection(self):
+        return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="Wasid@5284mysql",
+        database="face_recognizer"
+    )
     def add_data(self):
+        conn = None
         try:
             if self.var_dep.get() == "Select Department" or self.var_std_name.get() == "" or self.var_std_id.get() == "":   
              messagebox.showerror("Error", "All Fields are required!", parent=self.root)
             else:
-                conn = mysql.connector.connect( 
-                host="localhost",
-                user="root",
-                password="Wasid@5284mysql",
-                database="face_recognizer"
-            )
-                my_cursor = conn.cursor()
+                conn = self.get_connection()
+                my_cursor = conn.cursor() # type: ignore
                 my_cursor.execute(
                 "insert into student values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                 (
@@ -344,25 +348,24 @@ class Student:
             )
     
                 conn.commit()
-                conn.close()
     
                 messagebox.showinfo("Success", "Student details has been added Successfully", parent=self.root)
     
         except Exception as es:
+         
          messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+        finally:
+            if conn:
+                conn.close()
 
 
     # ///////////////// fetch data //////////
 
     def fetch_data(self):
+        conn = None
         try:
-                conn = mysql.connector.connect( 
-                host="localhost",
-                user="root",
-                password="Wasid@5284mysql",
-                database="face_recognizer"
-            )
-                my_cursor = conn.cursor()
+                conn = self.get_connection()
+                my_cursor = conn.cursor() # type: ignore
                 my_cursor.execute("select * from student")
                 data = my_cursor.fetchall()
 
@@ -410,13 +413,8 @@ class Student:
             else:
                 Update= messagebox.askyesno("Update", "Do you Want to update this student details: ", parent=self.root)
                 if Update > 0:
-                    conn = mysql.connector.connect( 
-                host="localhost",
-                user="root",
-                password="Wasid@5284mysql",
-                database="face_recognizer"
-            )
-                    my_cursor = conn.cursor()
+                    conn = self.get_connection()
+                    my_cursor = conn.cursor() # type: ignore
                     my_cursor.execute(
                 "update student set dep=%s,course=%s,year=%s,semester=%s,name=%s,division=%s,roll=%s,gender=%s,dob=%s,email=%s,phone=%s,address=%s,teacher=%s,photo_sample = %s where student_id=%s",
                 (
@@ -454,12 +452,61 @@ class Student:
 
 
 
+    #  ///////delete func /////
+    def delete_data(self):
+        if self.var_std_id.get() =="":
+            messagebox.showerror("Error", "Student id must be required", parent=self.root)
+        else:
+            try:
+                Delete = messagebox.askyesno("Student Delete Page","Do you Want to delete this student ", parent=self.root )
+                if Delete > 0:
+                    conn = self.get_connection()
+                    my_cursor= conn.cursor()
+                    sql = "delete from student where student_id=%s"
+                    val = (self.var_std_id.get(),)
+                    my_cursor.execute(sql,val)
+                else:
+                    if not delete:
+                        return
+                conn.commit()
+                self.fetch_data()
+                conn.close()
+                messagebox.showinfo("Delete","Successfully Delete",parent=self.root)
+
+
+
+
+            except Exception as es:
+                print(es)
+                messagebox.showerror("Error",f"Due To:{str(es)}", parent=self.root)
+    
+
+    # /////////// reset form /////////
+    def reset_data(self):
+
+        self.var_dep.set("Select Department")
+        self.var_course.set("Select Course")
+        self.var_year.set("Select Year")
+        self.var_semester.set("Select Semester")
+        self.var_std_name.set("")
+        self.var_div.set("Select Division")
+        self.var_roll.set("")
+        self.var_gender.set("Male")
+        self.var_dob.set("")
+        self.var_email.set("")
+        self.var_phone.set("")
+        self.var_address.set("")
+        self.var_teacher.set("")
+        self.var_radio1.set("")
+        self.var_std_id.set("")
+    
+
 
 
 
            
 
-
+    
         # for var in [self.var_std_id, self.var_std_name, self.var_div,
         #         self.var_roll, self.var_gender, self.var_dob,
         #         self.var_email, self.var_phone, self.var_address, self.var_teacher]:
