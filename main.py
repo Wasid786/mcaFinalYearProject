@@ -3,6 +3,8 @@ from PIL import Image, ImageTk
 from student import Student
 import os 
 from train import Train
+from face_recognition import Face_Recognition
+
 
 class Face_recognition_System:
     def __init__(self, root):
@@ -30,18 +32,18 @@ class Face_recognition_System:
             return ImageTk.PhotoImage(img)
 
         # Top 3 images
-        self.photoimg01 = load_image(r"D:\Projects\mcaProject\static\images\img01.jpg", header_width, header_height)
+        self.photoimg01 = load_image(r"static\images\img01.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg01).place(x=0, y=0, width=header_width, height=header_height)
 
-        self.photoimg02 = load_image(r"D:\Projects\mcaProject\static\images\img02.jpg", header_width, header_height)
+        self.photoimg02 = load_image(r"static\images\img02.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg02).place(x=header_width, y=0, width=header_width, height=header_height)
 
-        self.photoimg03 = load_image(r"D:\Projects\mcaProject\static\images\img03.jpg", header_width, header_height)
+        self.photoimg03 = load_image(r"static\images\img03.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg03).place(x=header_width*2, y=0, width=header_width, height=header_height)
 
         # Background image
         bg_height = self.screen_height - header_height
-        self.photobg_image = load_image(r"D:\Projects\mcaProject\static\images\img04.jpg", self.screen_width, bg_height)
+        self.photobg_image = load_image(r"static\images\img04.jpg", self.screen_width, bg_height)
         bg_img = Label(self.root, image=self.photobg_image)
         bg_img.place(x=0, y=header_height, width=self.screen_width, height=bg_height)
 
@@ -79,7 +81,7 @@ class Face_recognition_System:
 
         # Row 1
         create_button(r"static\images\img05.jpg", "Student Details", x_positions[0], y_top, command=self.student_details)
-        create_button(r"static\images\img06.jpg", "Face Detection", x_positions[1], y_top)
+        create_button(r"static\images\img06.jpg", "Face Detection", x_positions[1], y_top, command= self.face_data)
         create_button(r"static\images\img07.png", "Attendance", x_positions[2], y_top)
         create_button(r"static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
 
@@ -104,6 +106,13 @@ class Face_recognition_System:
     def train_data(self):
         self.new_window= Toplevel(self.root)
         self.app =Train(self.new_window)
+    
+    # //////////// train func //////////
+    def face_data(self):
+        self.new_window= Toplevel(self.root)
+        self.app =Face_Recognition(self.new_window)
+
+    
 
          
 
