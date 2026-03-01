@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import Image, ImageTk
 from student import Student
+import os 
 
 class Face_recognition_System:
     def __init__(self, root):
@@ -76,16 +77,22 @@ class Face_recognition_System:
     )
 
         # Row 1
-        create_button(r"D:\Projects\mcaProject\static\images\img05.jpg", "Student Details", x_positions[0], y_top, command=self.student_details)
-        create_button(r"D:\Projects\mcaProject\static\images\img06.jpg", "Face Detection", x_positions[1], y_top)
-        create_button(r"D:\Projects\mcaProject\static\images\img07.png", "Attendance", x_positions[2], y_top)
-        create_button(r"D:\Projects\mcaProject\static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
+        create_button(r"static\images\img05.jpg", "Student Details", x_positions[0], y_top, command=self.student_details)
+        create_button(r"static\images\img06.jpg", "Face Detection", x_positions[1], y_top)
+        create_button(r"static\images\img07.png", "Attendance", x_positions[2], y_top)
+        create_button(r"static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
 
         # Row 2
-        create_button(r"D:\Projects\mcaProject\static\images\img09.jpg", "Train Data", x_positions[0], y_bottom)
-        create_button(r"D:\Projects\mcaProject\static\images\img10.jpg", "Photos", x_positions[1], y_bottom)
-        create_button(r"D:\Projects\mcaProject\static\images\img11.png", "Developer", x_positions[2], y_bottom)
-        create_button(r"D:\Projects\mcaProject\static\images\img12.jpg", "Exit", x_positions[3], y_bottom)
+        create_button(r"static\images\img09.jpg", "Train Data", x_positions[0], y_bottom)
+        create_button(r"static\images\img10.jpg", "Photos", x_positions[1], y_bottom,command=self.open_img)
+        create_button(r"static\images\img11.png", "Developer", x_positions[2], y_bottom)
+        create_button(r"static\images\img12.jpg", "Exit", x_positions[3], y_bottom)
+
+
+    
+    def open_img(self):
+        os.startfile("data")
+
 
     
     def student_details(self):
