@@ -1,7 +1,13 @@
+from email import message
 from tkinter import *
+from tkinter import messagebox
 from PIL import Image, ImageTk
+import os 
+import numpy as np
+import cv2
 
-class Student:
+
+class Train:
     def __init__(self, root):
         self.root = root
         self.screen_width = self.root.winfo_screenwidth()
@@ -31,7 +37,7 @@ class Student:
         Label(self.root, image=self.photoimg02).place(x=header_width, y=46, width=header_width, height=header_height)
 
 
-        b1_1 = Button(self.root, text="Train Data", cursor="hand2", font=("times new roman", 30,"bold"), bg="red", fg="white")
+        b1_1 = Button(self.root, text="Train Data",command=self.train_classifier,  cursor="hand2", font=("times new roman", 30,"bold"), bg="red", fg="white")
         b1_1.place(x=0,y=500, width=2000, height=60)
 
         self.photoimg03 = load_image(r"static\images\img01.jpg", header_width, header_height)
@@ -41,6 +47,42 @@ class Student:
         Label(self.root, image=self.photoimg04).place(x=header_width, y=600, width=header_width, height=header_height)
 
         
+    def train_classifier(self):
+        data_dir = "data"
+
+        path = [os.path.join(data_dir, file) for file in os.listdir(data_dir)]
+
+        if len(path) == 0:
+            messagebox.showerror("Error", "No images found in data folder!")
+            return
+
+        faces = []
+        ids = []
+
+        for image in path:
+            img = Image.open(image).convert('L')
+            imageNp = np.array(img, 'uint8')
+
+            file_name = os.path.split(image)[1]
+            student_id = int(file_name.split('.')[1])
+
+            faces.append(imageNp)
+            ids.append(student_id)
+
+            cv2.imshow("Training", imageNp)
+            cv2.waitKey(1)
+
+        ids = np.array(ids)
+
+        clf = cv2.face.LBPHFaceRecognizer_create()  # type: ignore # use opencv-contrib-python instead of cv-python
+        clf.train(faces, ids)
+        clf.write("classifier.xml")
+
+        cv2.destroyAllWindows()
+        messagebox.showinfo("Result", "Training datasets completed!")
+
+
+
 
 
 
@@ -53,5 +95,5 @@ class Student:
 
 if __name__ == "__main__":
     root = Tk()
-    app = Student(root)
+    app = Train(root)
     root.mainloop()

@@ -2,6 +2,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 from student import Student
 import os 
+from train import Train
 
 class Face_recognition_System:
     def __init__(self, root):
@@ -83,7 +84,7 @@ class Face_recognition_System:
         create_button(r"static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
 
         # Row 2
-        create_button(r"static\images\img09.jpg", "Train Data", x_positions[0], y_bottom)
+        create_button(r"static\images\img09.jpg", "Train Data", x_positions[0], y_bottom, command=self.train_data)
         create_button(r"static\images\img10.jpg", "Photos", x_positions[1], y_bottom,command=self.open_img)
         create_button(r"static\images\img11.png", "Developer", x_positions[2], y_bottom)
         create_button(r"static\images\img12.jpg", "Exit", x_positions[3], y_bottom)
@@ -94,10 +95,16 @@ class Face_recognition_System:
         os.startfile("data")
 
 
-    
+    # ////////// student detail function ////////
     def student_details(self):
         self.new_window = Toplevel(self.root)
         self.app = Student(self.new_window)
+
+    # //////////// train func //////////
+    def train_data(self):
+        self.new_window= Toplevel(self.root)
+        self.app =Train(self.new_window)
+
          
 
 
