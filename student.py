@@ -45,17 +45,17 @@ class Student:
             img = img.resize((w, h), Image.Resampling.LANCZOS)
             return ImageTk.PhotoImage(img)
 
-        self.photoimg01 = load_image(r"D:\Projects\mcaProject\static\images\img01.jpg", header_width, header_height)
+        self.photoimg01 = load_image(r"static\images\img01.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg01).place(x=0, y=0, width=header_width, height=header_height)
 
-        self.photoimg02 = load_image(r"D:\Projects\mcaProject\static\images\img02.jpg", header_width, header_height)
+        self.photoimg02 = load_image(r"static\images\img02.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg02).place(x=header_width, y=0, width=header_width, height=header_height)
 
-        self.photoimg03 = load_image(r"D:\Projects\mcaProject\static\images\img03.jpg", header_width, header_height)
+        self.photoimg03 = load_image(r"static\images\img03.jpg", header_width, header_height)
         Label(self.root, image=self.photoimg03).place(x=header_width*2, y=0, width=header_width, height=header_height)
 
         bg_height = self.screen_height - header_height
-        self.photobg_image = load_image(r"D:\Projects\mcaProject\static\images\img04.jpg", self.screen_width, bg_height)
+        self.photobg_image = load_image(r"static\images\img04.jpg", self.screen_width, bg_height)
         bg_img = Label(self.root, image=self.photobg_image)
         bg_img.place(x=0, y=header_height, width=self.screen_width, height=bg_height)
 
@@ -93,7 +93,7 @@ class Student:
         img_w = left_width - 10
         img_h = int(left_height * 0.18)
 
-        img_left = Image.open(r"D:\Projects\mcaProject\static\images\img05.jpg")
+        img_left = Image.open(r"static\images\img05.jpg")
         img_left = img_left.resize((img_w, img_h), Image.Resampling.LANCZOS)
         self.photoimg_left = ImageTk.PhotoImage(img_left)
         f_lbl = Label(Left_frame, image=self.photoimg_left)
@@ -248,7 +248,7 @@ class Student:
         Right_frame.place(x=right_x, y=gap, width=right_width, height=right_height)
 
         # Image inside right frame
-        img_right = Image.open(r"D:\Projects\mcaProject\static\images\img06.jpg")
+        img_right = Image.open(r"static\images\img06.jpg")
         img_right = img_right.resize((right_width - 10, 130), Image.Resampling.LANCZOS)
         self.photoimg_right = ImageTk.PhotoImage(img_right)
         Label(Right_frame, image=self.photoimg_right).place(x=5, y=0, width=right_width - 10, height=130)

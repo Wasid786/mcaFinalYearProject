@@ -1,11 +1,6 @@
-from email import message
 from tkinter import *
-from tkinter import messagebox
-from xmlrpc.client import DateTime
 from PIL import Image, ImageTk
-import os 
 import mysql.connector
-import numpy as np
 import cv2
 from time import strftime
 from datetime import datetime
