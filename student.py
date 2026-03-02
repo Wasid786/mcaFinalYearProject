@@ -276,7 +276,7 @@ class Student:
 
         # Table Frame
         table_frame = LabelFrame(Right_frame, bd=2, bg="white", relief=RIDGE)
-        table_frame.place(x=5, y=210, width=right_width - 10, height=right_height - 220)
+        table_frame.place(x=5, y=180, width=right_width - 10, height=right_height - 220)
 
         scroll_x = ttk.Scrollbar(table_frame, orient=HORIZONTAL)
         scroll_y = ttk.Scrollbar(table_frame, orient=VERTICAL)

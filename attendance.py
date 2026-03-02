@@ -201,7 +201,7 @@ class Attendance:
 
 
 
-        # ///////// right frame //////////
+        # ===== RIGHT FRAME: starts at 50% and takes remaining half =====
         right_x = left_width + (gap * 2)
         right_width = main_width - right_x - gap
         right_height = left_height
@@ -212,6 +212,50 @@ class Attendance:
             bg="white", fg="red"
         )
         Right_frame.place(x=right_x, y=gap, width=right_width, height=right_height)
+
+        # Image inside right frame
+        img_right = Image.open(r"static\images\img06.jpg")
+        img_right = img_right.resize((right_width - 10, 130), Image.Resampling.LANCZOS)
+        self.photoimg_right = ImageTk.PhotoImage(img_right)
+        Label(Right_frame, image=self.photoimg_right).place(x=5, y=0, width=right_width - 10, height=130)
+
+
+        # Table Frame
+        table_frame = LabelFrame(Right_frame, bd=2, bg="white", relief=RIDGE)
+        table_frame.place(x=5, y=180, width=right_width - 10, height=right_height - 220)
+
+        scroll_x = ttk.Scrollbar(table_frame, orient=HORIZONTAL)
+        scroll_y = ttk.Scrollbar(table_frame, orient=VERTICAL)
+
+        self.attendanceReportTable = ttk.Treeview(
+            table_frame,
+            columns=("id","roll","name","department","time","date","attendance"),
+            xscrollcommand=scroll_x.set,
+            yscrollcommand=scroll_y.set
+        )
+
+        scroll_x.config(command=self.attendanceReportTable.xview)
+        scroll_y.config(command=self.attendanceReportTable.yview)
+        scroll_x.pack(side=BOTTOM, fill=X)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        
+
+
+        self.attendanceReportTable.heading("id",text="Attendance ID")
+        self.attendanceReportTable.heading("roll",text="Roll")
+        self.attendanceReportTable.heading("name",text="Name")
+        self.attendanceReportTable.heading("department",text="Department")
+        self.attendanceReportTable.heading("time",text="Time")
+        self.attendanceReportTable.heading("date",text="Date")
+        self.attendanceReportTable.heading("attendance",text="Attendance")
+        # //////// for removing extra empty row ////////
+        self.attendanceReportTable["show"]= "headings"
+
+
+        self.attendanceReportTable.column("id",width=100)
+
+        self.attendanceReportTable.pack(fill=BOTH,expand=1)
+
 
 
 
