@@ -1,11 +1,14 @@
 from email import message
 from tkinter import *
 from tkinter import messagebox
+from xmlrpc.client import DateTime
 from PIL import Image, ImageTk
 import os 
 import mysql.connector
 import numpy as np
 import cv2
+from time import strftime
+from datetime import datetime
 
 
 class Face_Recognition:
@@ -15,6 +18,8 @@ class Face_Recognition:
         self.screen_height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
         self.root.title("Face recognition Page")
+        # //////////  for attendance ///////
+        self.marked_ids = set()
 
         # Title (full width, fixed height)
         title_lbl = Label(self.root, text="Face Recognition",
@@ -50,7 +55,27 @@ class Face_Recognition:
         user="root",
         password="Wasid@5284mysql",
         database="face_recognizer"
+
+
+
+
     )
+
+    # /////////////////  attendance ///////////
+    def mark_attendance(self, i, r, n, d):
+        if i in self.marked_ids:
+            return   # already marked → skip
+
+        self.marked_ids.add(i)
+
+        with open("attendanceFile.csv", "a", newline="\n") as f:
+            now = datetime.now()
+            d1 = now.strftime("%d/%m/%y")
+            dtString = now.strftime("%H:%M:%S")
+
+            f.writelines(f"\n{i},{r},{n},{d},{dtString},{d1},Present")
+
+
     
     # //////////// face recognition/////////
     def face_recog(self):
@@ -80,11 +105,19 @@ class Face_Recognition:
                 d = my_cursor.fetchone()
                 d = d[0] if d else "Unknown" # type: ignore
 
-                if confidence > 76:
+
+                my_cursor.execute("SELECT student_id FROM student WHERE student_id=%s", (id,))
+                i = my_cursor.fetchone()
+                i = i[0] if i else "Unknown" # type: ignore
+
+
+
+                if confidence > 78:
+                    cv2.putText(img, f"ID:{i}",(x,y-75),cv2.FONT_HERSHEY_COMPLEX,0.8,(255,255,255),2)
                     cv2.putText(img, f"Roll:{r}",(x,y-55),cv2.FONT_HERSHEY_COMPLEX,0.8,(255,255,255),2)
                     cv2.putText(img, f"Name:{n}",(x,y-30),cv2.FONT_HERSHEY_COMPLEX,0.8,(255,255,255),2)
                     cv2.putText(img, f"Department:{d}",(x,y-5),cv2.FONT_HERSHEY_COMPLEX,0.8,(255,255,255),2)
-
+                    self.mark_attendance(i,r, n,d)
                 else:
                     cv2.rectangle(img,(x,y), (x+w,y+h), (0,0,255), 3)
                     cv2.putText(img, f"UnKnown Face",(x,y-55),cv2.FONT_HERSHEY_COMPLEX,0.8,(255,255,255),2)
