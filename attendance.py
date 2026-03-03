@@ -1,6 +1,9 @@
+from email import message
 import os
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+from winsound import MessageBeep
 from PIL import Image, ImageTk
 import mysql.connector
 import cv2
@@ -8,6 +11,8 @@ from time import strftime
 from datetime import datetime
 import csv
 from tkinter import filedialog
+
+from numpy import delete
 
 
 mydata= []
@@ -18,7 +23,7 @@ class Attendance:
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
-        self.root.title("Attendance Page")
+        self.root.title("Attendance Page")        
 
         # //////////////////// variables for data sending at database /////////
         self.var_attendance_id = StringVar()
@@ -192,7 +197,7 @@ class Attendance:
             btn_frame.columnconfigure(i, weight=1)
 
         Button(btn_frame, text="Import CSV", command=self.importCSV ,font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
-        Button(btn_frame, text="Export CSV", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
+        Button(btn_frame, text="Export CSV",command=self.exportCSV, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
         Button(btn_frame, text="Update", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
         Button(btn_frame, text="Reset" , font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
 
@@ -261,20 +266,75 @@ class Attendance:
 
         self.attendanceReportTable.pack(fill=BOTH,expand=1)
 
+        self.attendanceReportTable.bind("<ButtonRelease>",self.get_cursor)
+
     # //////////face data////////////
     def fetchData(self, rows):
         self.attendanceReportTable.delete(*self.attendanceReportTable.get_children())
         for i in rows:
             self.attendanceReportTable.insert("",END, values=i)
+    
+    # //////// import csv ///////
 
     def importCSV(self):
         global mydata
+        mydata.clear()
         fln = filedialog.askopenfilename(initialdir=os.getcwd(),title="Open CSV",filetypes=(("CSV File","*.csv"), ("All File","*.*")),parent=self.root)
         with open(fln) as myfile:
             csvread = csv.reader(myfile, delimiter=",")
             for i in csvread:
                 mydata.append(i)
             self.fetchData(mydata)
+
+
+    # ////////// export csv ///////////
+    def exportCSV(self):
+        try:
+            if len(mydata) < 1:
+                messagebox.showerror("No Data","No Data Found!",parent=self.root)
+                return False
+            fln = filedialog.asksaveasfilename(
+    initialdir=os.getcwd(),
+    title="Save CSV",
+    defaultextension=".csv",
+    filetypes=(("CSV File", "*.csv"), ("All File", "*.*")),
+    parent=self.root
+)
+
+            if fln:
+                with open(fln, mode="w", newline="") as myfile:
+                    exp_write = csv.writer(myfile, delimiter=",")
+                    exp_write.writerows(mydata)
+
+                    messagebox.showinfo(
+        "Data Export",
+        "Your Data Exported to " + os.path.basename(fln) + " successfully"
+    )    
+
+        except Exception as e:
+            messagebox.showerror("Error",f"Due to :{str(e)}", parent=self.root)
+    
+
+
+
+    def get_cursor(self,event):
+        cursor_row  = self.attendanceReportTable.focus()
+        content = self.attendanceReportTable.item(cursor_row)
+        rows = content['values']
+        if rows:  
+            self.var_attendance_id.set(rows[0])
+            self.var_roll.set(rows[1])
+            self.var_name.set(rows[2])
+            self.var_dep.set(rows[3])
+            self.var_time.set(rows[4])
+            self.var_date.set(rows[5])
+            self.var_attendance_status.set(rows[6])
+
+
+
+
+
+
 
 
 
