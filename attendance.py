@@ -199,7 +199,7 @@ class Attendance:
         Button(btn_frame, text="Import CSV", command=self.importCSV ,font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
         Button(btn_frame, text="Export CSV",command=self.exportCSV, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
         Button(btn_frame, text="Update", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
-        Button(btn_frame, text="Reset" , font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
+        Button(btn_frame, text="Reset" ,command=self.reset_data, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
 
 
 
@@ -329,6 +329,16 @@ class Attendance:
             self.var_time.set(rows[4])
             self.var_date.set(rows[5])
             self.var_attendance_status.set(rows[6])
+
+    
+    def reset_data(self):
+        self.var_attendance_id.set("")
+        self.var_roll.set("")
+        self.var_name.set("")
+        self.var_dep.set("")
+        self.var_time.set("")
+        self.var_date.set("")
+        self.var_attendance_status.set("")
 
 
 
