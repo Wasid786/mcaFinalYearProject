@@ -1,9 +1,11 @@
 from tkinter import *
 from PIL import Image, ImageTk
+import attendance
 from student import Student
 import os 
 from train import Train
 from face_recognition import Face_Recognition
+from attendance import Attendance
 
 
 class Face_recognition_System:
@@ -82,7 +84,7 @@ class Face_recognition_System:
         # Row 1
         create_button(r"static\images\img05.jpg", "Student Details", x_positions[0], y_top, command=self.student_details)
         create_button(r"static\images\img06.jpg", "Face Detection", x_positions[1], y_top, command= self.face_data)
-        create_button(r"static\images\img07.png", "Attendance", x_positions[2], y_top)
+        create_button(r"static\images\img07.png", "Attendance", x_positions[2], y_top, command= self.attendance_data)
         create_button(r"static\images\img08.jpg", "Help Desk", x_positions[3], y_top)
 
         # Row 2
@@ -111,6 +113,11 @@ class Face_recognition_System:
     def face_data(self):
         self.new_window= Toplevel(self.root)
         self.app =Face_Recognition(self.new_window)
+
+    # //// for attendance ////////
+    def attendance_data(self):
+        self.new_window= Toplevel(self.root)
+        self.app =Attendance(self.new_window)
 
     
 
