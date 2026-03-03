@@ -316,7 +316,7 @@ class Attendance:
     
 
 
-
+    # /////////// show attendance data //////////
     def get_cursor(self,event):
         cursor_row  = self.attendanceReportTable.focus()
         content = self.attendanceReportTable.item(cursor_row)
@@ -329,8 +329,14 @@ class Attendance:
             self.var_time.set(rows[4])
             self.var_date.set(rows[5])
             self.var_attendance_status.set(rows[6])
-
     
+
+    # ////////// update feature remain ! ////////////////////////////////////////////////////
+
+
+
+
+    # ////////////// reset feature added  ////////////
     def reset_data(self):
         self.var_attendance_id.set("")
         self.var_roll.set("")
