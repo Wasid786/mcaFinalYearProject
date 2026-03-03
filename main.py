@@ -1,3 +1,4 @@
+from time import strftime
 from tkinter import *
 import tkinter
 from tkinter import messagebox
@@ -52,9 +53,19 @@ class Face_recognition_System:
         bg_img.place(x=0, y=header_height, width=self.screen_width, height=bg_height)
 
         # Title
-        Label(bg_img, text="Lab Attendance System",
+        title_lbl = Label(bg_img, text="Lab Attendance System",
               font=("times new roman", int(self.screen_width*0.02), "bold"),
-              bg="white", fg="red").place(x=0, y=0, width=self.screen_width, height=50)
+              bg="white", fg="red")
+        title_lbl.place(x=0, y=0, width=self.screen_width, height=50)
+        
+        def time():
+            string = strftime('%H:%M:%S %p')
+            lbl.config(text= string)
+            lbl.after(1000,time)
+        
+        lbl = Label(title_lbl, font=('times new roman', 14,'bold'),background='white',foreground='blue')
+        lbl.place(x=0,y=0,width=110, height=50)
+        time()
 
         #  Button size relative
         btn_w = int(self.screen_width * 0.12)
