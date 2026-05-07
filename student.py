@@ -241,61 +241,178 @@ class Student:
         right_height = left_height
 
         Right_frame = LabelFrame(
-            main_frame, bd=2, relief=RIDGE, text="Right Frame",
-            font=("times new roman", 20, "bold"),
-            bg="white", fg="red"
-        )
-        Right_frame.place(x=right_x, y=gap, width=right_width, height=right_height)
+    main_frame,
+    bd=2,
+    relief=RIDGE,
+    text="Student Details",
+    font=("times new roman", 20, "bold"),
+    bg="white",
+    fg="red"
+)
+        Right_frame.place(
+    x=right_x,
+    y=gap,
+    width=right_width,
+    height=right_height
+)
 
         # Image inside right frame
+        # ================= IMAGE =================
         img_right = Image.open(r"static\images\img06.jpg")
-        img_right = img_right.resize((right_width - 10, 130), Image.Resampling.LANCZOS)
+        img_right = img_right.resize((800, 130), Image.Resampling.LANCZOS)
+
         self.photoimg_right = ImageTk.PhotoImage(img_right)
-        Label(Right_frame, image=self.photoimg_right).place(x=5, y=0, width=right_width - 10, height=130)
+
+        img_label = Label(
+    Right_frame,
+    image=self.photoimg_right,
+    bg="white"
+)
+
+        img_label.place(
+    relx=0.01,
+    rely=0.01,
+    relwidth=0.98,
+    height=130
+)
 
         # Search Frame (placed below image)
         search_frame = LabelFrame(
-            Right_frame, bd=2, relief=RIDGE, text="Search Student",
-            font=("times new roman", 15, "bold"),
-            bg="white", fg="red"
-        )
-        search_frame.place(x=5, y=135, width=right_width - 10, height=70)
+    Right_frame,
+    bd=2,
+    relief=RIDGE,
+    text="Search Student",
+    font=("times new roman", 15, "bold"),
+    bg="white",
+    fg="red"
+)
 
-        Label(search_frame, text="Search By:", font=("times new roman", 13, "bold"), bg="red", fg="black").grid(row=0, column=0, padx=12, pady=5, sticky=W)
+        search_frame.place(
+    relx=0.01,
+    rely=0.18,
+    relwidth=0.98,
+    height=80
+)
 
-        search_combo = ttk.Combobox(search_frame, font=("times new roman", 12, "bold"), state="readonly", width=13)
+        # Make columns responsive
+        for i in range(5):
+            search_frame.grid_columnconfigure(i, weight=1)
+
+        Label(
+    search_frame,
+    text="Search By:",
+    font=("times new roman", 13, "bold"),
+    bg="red",
+    fg="black"
+).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        search_combo = ttk.Combobox(
+    search_frame,
+    font=("times new roman", 12, "bold"),
+    state="readonly"
+)
+
         search_combo["values"] = ("Select", "Roll_No", "Phone_No")
         search_combo.current(0)
-        search_combo.grid(row=0, column=1, padx=2, pady=10, sticky=W)
 
-        search_entry = ttk.Entry(search_frame, width=15, font=("times new roman", 13, "bold"))
-        search_entry.grid(row=0, column=2, padx=10, pady=5, sticky=W)
+        search_combo.grid(
+    row=0,
+    column=1,
+    padx=10,
+    pady=10,
+    sticky="ew"
+)
 
-        Button(search_frame, text="Search",   width=14, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, padx=10, pady=5)
-        Button(search_frame, text="Show All", width=14, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=4, padx=10, pady=5)
+        search_entry = ttk.Entry(
+    search_frame,
+    font=("times new roman", 13, "bold")
+)
 
-        # Table Frame
-        table_frame = LabelFrame(Right_frame, bd=2, bg="white", relief=RIDGE)
-        table_frame.place(x=5, y=180, width=right_width - 10, height=right_height - 220)
+        search_entry.grid(
+    row=0,
+    column=2,
+    padx=10,
+    pady=10,
+    sticky="ew"
+)
 
-        scroll_x = ttk.Scrollbar(table_frame, orient=HORIZONTAL)
-        scroll_y = ttk.Scrollbar(table_frame, orient=VERTICAL)
+        Button(
+    search_frame,
+    text="Search",
+    font=("times new roman", 12, "bold"),
+    bg="blue",
+    fg="white"
+).grid(
+    row=0,
+    column=3,
+    padx=10,
+    pady=10,
+    sticky="ew"
+)
 
+        Button(
+    search_frame,
+    text="Show All",
+    font=("times new roman", 12, "bold"),
+    bg="blue",
+    fg="white"
+).grid(
+    row=0,
+    column=4,
+    padx=10,
+    pady=10,
+    sticky="ew"
+)
+
+        # ================= TABLE FRAME =================
+        table_frame = Frame(
+    Right_frame,
+    bd=2,
+    relief=RIDGE,
+    bg="white"
+)
+
+        table_frame.place(
+    relx=0.01,
+    rely=0.30,
+    relwidth=0.98,
+    relheight=0.68
+)
+
+        # Scrollbars
+        scroll_x = ttk.Scrollbar(
+    table_frame,
+    orient=HORIZONTAL
+)
+
+        scroll_y = ttk.Scrollbar(
+    table_frame,
+    orient=VERTICAL
+)
+        
+
+        # Treeview
         self.student_table = ttk.Treeview(
-            table_frame,
-            columns=("dep", "course", "year", "sem", "id", "name", "div", "roll",
-                     "gender", "dob", "email", "phone", "address", "teacher", "photo"),
-            xscrollcommand=scroll_x.set,
-            yscrollcommand=scroll_y.set
-        )
+    table_frame,
+    columns=(
+        "dep", "course", "year", "sem", "id",
+        "name", "div", "roll", "gender", "dob",
+        "email", "phone", "address", "teacher", "photo"
+    ),
+    xscrollcommand=scroll_x.set,
+    yscrollcommand=scroll_y.set
+)
 
         scroll_x.config(command=self.student_table.xview)
         scroll_y.config(command=self.student_table.yview)
+
         scroll_x.pack(side=BOTTOM, fill=X)
         scroll_y.pack(side=RIGHT, fill=Y)
-        self.student_table.pack(fill=BOTH, expand=1)
-        self.fetch_data()
-        self.student_table.bind("<ButtonRelease>", self.get_cursor)
+
+        self.student_table.pack(
+    fill=BOTH,
+    expand=True
+)
 
 
         headings = {
@@ -309,6 +426,13 @@ class Student:
             self.student_table.column(col_id, width=120)
 
         self.student_table["show"] = "headings"
+        # ================= EVENTS =================
+        self.fetch_data()
+
+        self.student_table.bind(
+    "<ButtonRelease>",
+    self.get_cursor
+)
 
 
     # ////////////////////   func for db connection /////////////////
