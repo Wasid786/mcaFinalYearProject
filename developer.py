@@ -46,6 +46,8 @@ class Developer:
     width=self.screen_width,
     height=bg_height
 )
+        
+        
     
 
 
