@@ -34,6 +34,8 @@ class Student:
         self.var_phone  = StringVar()
         self.var_address   = StringVar()
         self.var_teacher    = StringVar()
+        self.var_search_by  = StringVar()
+        self.var_search_txt = StringVar()
 
 
         header_height = int(self.screen_height * 0.15)
@@ -308,6 +310,7 @@ class Student:
 
         search_combo = ttk.Combobox(
     search_frame,
+    textvariable=self.var_search_by,
     font=("times new roman", 12, "bold"),
     state="readonly"
 )
@@ -325,6 +328,7 @@ class Student:
 
         search_entry = ttk.Entry(
     search_frame,
+    textvariable=self.var_search_txt,
     font=("times new roman", 13, "bold")
 )
 
@@ -339,6 +343,7 @@ class Student:
         Button(
     search_frame,
     text="Search",
+    command=self.search_data,
     font=("times new roman", 12, "bold"),
     bg="blue",
     fg="white"
@@ -353,6 +358,7 @@ class Student:
         Button(
     search_frame,
     text="Show All",
+    command=self.fetch_data,
     font=("times new roman", 12, "bold"),
     bg="blue",
     fg="white"
@@ -486,6 +492,41 @@ class Student:
             if conn:
                 conn.close()
 
+
+    # ///////////////// search data //////////
+
+    def search_data(self):
+        if self.var_search_by.get() == "Select" or self.var_search_by.get() == "":
+            messagebox.showerror("Error", "Please select a search category", parent=self.root)
+            return
+        if self.var_search_txt.get().strip() == "":
+            messagebox.showerror("Error", "Please enter a search value", parent=self.root)
+            return
+
+        conn = None
+        try:
+            conn = self.get_connection()
+            my_cursor = conn.cursor()
+
+            if self.var_search_by.get() == "Roll_No":
+                my_cursor.execute("SELECT * FROM student WHERE roll=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Phone_No":
+                my_cursor.execute("SELECT * FROM student WHERE phone=%s", (self.var_search_txt.get().strip(),))
+
+            data = my_cursor.fetchall()
+            self.student_table.delete(*self.student_table.get_children())
+
+            if len(data) != 0:
+                for row in data:
+                    self.student_table.insert("", END, values=tuple(row))
+            else:
+                messagebox.showinfo("Not Found", "No student record found for the given search", parent=self.root)
+
+        except Exception as es:
+            messagebox.showerror("Error", f"Due To: {str(es)}", parent=self.root)
+        finally:
+            if conn:
+                conn.close()
 
     # ///////////////// fetch data //////////
 
