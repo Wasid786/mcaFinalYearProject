@@ -315,7 +315,7 @@ class Student:
     state="readonly"
 )
 
-        search_combo["values"] = ("Select", "Roll_No", "Phone_No")
+        search_combo["values"] = ("Select", "Roll_No","Name","Course","Gender","Email","Teacher", "Phone_No")
         search_combo.current(0)
 
         search_combo.grid(
@@ -510,6 +510,16 @@ class Student:
 
             if self.var_search_by.get() == "Roll_No":
                 my_cursor.execute("SELECT * FROM student WHERE roll=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Name":
+                my_cursor.execute("SELECT * FROM student WHERE name=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Course":
+                my_cursor.execute("SELECT * FROM student WHERE course=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Gender":
+                my_cursor.execute("SELECT * FROM student WHERE gender=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Email":
+                my_cursor.execute("SELECT * FROM student WHERE email=%s", (self.var_search_txt.get().strip(),))
+            elif self.var_search_by.get() == "Teacher":
+                my_cursor.execute("SELECT * FROM student WHERE teacher=%s", (self.var_search_txt.get().strip(),))
             elif self.var_search_by.get() == "Phone_No":
                 my_cursor.execute("SELECT * FROM student WHERE phone=%s", (self.var_search_txt.get().strip(),))
 
