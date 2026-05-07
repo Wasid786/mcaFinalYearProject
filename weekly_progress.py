@@ -6,17 +6,17 @@ from time import strftime
 from datetime import datetime
 
 
-class Developer:
+class Weekly_Progress:
     def __init__(self, root):
         self.root = root
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
         self.root.geometry(f"{self.screen_width}x{self.screen_height}+0+0")
-        self.root.title("Developer page")
+        self.root.title("Weekly Progress page")
 
 
         # Title (full width, fixed height)
-        title_lbl = Label(self.root, text="Train Data Set",
+        title_lbl = Label(self.root, text="Weekly Progress",
                           font=("times new roman", 30, "bold"),
                           bg="white", fg="blue")
         title_lbl.place(relx=0, rely=0, relwidth=1, height=50)
@@ -58,5 +58,5 @@ class Developer:
 
 if __name__ == "__main__":
     root = Tk()
-    app = Developer(root)
+    app = Weekly_Progress(root)
     root.mainloop()

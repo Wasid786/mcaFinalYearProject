@@ -3,11 +3,13 @@ from tkinter import *
 import tkinter
 from tkinter import messagebox
 from PIL import Image, ImageTk
+from weekly_progress import Weekly_Progress
 from student import Student
 import os 
 from train import Train
 from face_recognition import Face_Recognition
 from attendance import Attendance
+import weekly_progress
 
 
 
@@ -103,7 +105,7 @@ class Face_recognition_System:
         # Row 2
         create_button(r"static\images\img09.jpg", "Train Data", x_positions[0], y_bottom, command=self.train_data)
         create_button(r"static\images\img10.jpg", "Photos", x_positions[1], y_bottom,command=self.open_img)
-        create_button(r"static\images\img11.png", "Developer", x_positions[2], y_bottom)
+        create_button(r"static\images\img11.png", "Weekly Progress", x_positions[2], y_bottom, command=self.weekly_progress)
         create_button(r"static\images\img12.jpg", "Exit", x_positions[3], y_bottom ,command=self.exit_func)
 
 
@@ -122,15 +124,20 @@ class Face_recognition_System:
         self.new_window= Toplevel(self.root)
         self.app =Train(self.new_window)
     
-    # //////////// train func //////////
+    # //////////// face recognition func //////////
     def face_data(self):
         self.new_window= Toplevel(self.root)
         self.app =Face_Recognition(self.new_window)
 
-    # //// for attendance ////////
+    # ////  attendance func  ////////
     def attendance_data(self):
         self.new_window= Toplevel(self.root)
         self.app =Attendance(self.new_window)
+    
+    # //// weekly_progress func ////////
+    def weekly_progress(self):
+        self.new_window= Toplevel(self.root)
+        self.app =Weekly_Progress(self.new_window)
 
     # //////// for exit ////////////
     def exit_func(self):
