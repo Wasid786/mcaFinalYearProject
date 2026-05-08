@@ -304,6 +304,15 @@ class Attendance:
             if fln:
                 with open(fln, mode="w", newline="") as myfile:
                     exp_write = csv.writer(myfile, delimiter=",")
+                    exp_write.writerow([
+                    "AttendanceId",
+                    "Roll",
+                    "Name",
+                    "Dept",
+                    "Time",
+                    "Date",
+                    "Attendance Status"
+                ])
                     exp_write.writerows(mydata)
 
                     messagebox.showinfo(
