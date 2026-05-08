@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import mysql.connector
 import bcrypt
 
-from face_recognition import Face_Recognition
+from main import Face_recognition_System
 from register import Register
 from emailOTP import EmailOTPWindow
 
@@ -124,7 +124,7 @@ class Login_Window:
             # Credentials correct → confirm before opening main window
             if messagebox.askyesno("Access", "Access only for authorised personnel. Continue?"):
                 self.new_window = Toplevel(self.root)
-                self.app = Face_Recognition(self.new_window)
+                self.app = Face_recognition_System(self.new_window)
 
         except Exception as es:
             messagebox.showerror("Error", str(es))

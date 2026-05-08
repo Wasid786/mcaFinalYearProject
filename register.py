@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 import mysql.connector
 import bcrypt
 from emailOTP import EmailOTPWindow
-from face_recognition import Face_Recognition
+from main import Face_recognition_System
 
 
 class Register:
@@ -294,7 +294,7 @@ class Register:
 
             #open face recogintion window
             new_root = tk.Tk()
-            app =  Face_Recognition(new_root)
+            app =  Face_recognition_System(new_root)
             new_root.mainloop()
 
         except Exception as e:
