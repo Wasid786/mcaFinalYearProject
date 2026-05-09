@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import mysql.connector
@@ -141,6 +142,7 @@ class Register:
             bg="blue",
             fg="white",
             cursor="hand2",
+            command=self.login_data,
         ).grid(row=10, column=1, pady=20, padx=20, sticky="ew")
 
     # ================= PASSWORD STRENGTH =================
@@ -251,6 +253,16 @@ class Register:
             email=self.var_email.get(),
             on_success=self._save_to_db,
         )
+    #=========================== navigate to login ===============
+    def login_data(self):
+        from login import Login_Window
+    # hide current window
+        self.root.destroy()
+
+    # create login window
+        root = Tk()
+        app = Login_Window(root)
+        root.mainloop()
 
     # ================= SAVE (called after OTP verified) =================
     def _save_to_db(self):
