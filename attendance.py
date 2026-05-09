@@ -150,7 +150,7 @@ class Attendance:
 
         Button(btn_frame, text="Import CSV",  command=self.importCSV,  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
         Button(btn_frame, text="Export CSV",  command=self.exportCSV,  font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
-        Button(btn_frame, text="Update",                                font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
+        Button(btn_frame, text="Update",       command=self.update_data,font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=2, sticky="nsew")
         Button(btn_frame, text="Reset",       command=self.reset_data, font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=3, sticky="nsew")
 
         # ── RIGHT FRAME ──────────────────────────────────────────────────────
@@ -331,6 +331,54 @@ class Attendance:
         self.var_time.set("")
         self.var_date.set("")
         self.var_attendance_status.set("")
+
+    # =========== update attendance form ####################
+    def update_data(self):
+        global mydata
+
+        # Get the attendance ID from the form
+        attendance_id = self.var_attendance_id.get()
+
+        # Check if the user selected a row from the table
+        if attendance_id == "":
+            messagebox.showerror("No Selection", "Please select a record from the table first.", parent=self.root)
+            return
+
+        # Check if the user picked a valid attendance status
+        attendance_status = self.var_attendance_status.get()
+        if attendance_status == "" or attendance_status == "Status":
+            messagebox.showerror("Missing Status", "Please select Present or Absent.", parent=self.root)
+            return
+
+        # Get all the other form values
+        roll   = self.var_roll.get()
+        name   = self.var_name.get()
+        dep    = self.var_dep.get()
+        time   = self.var_time.get()
+        date   = self.var_date.get()
+
+        # Loop through mydata to find the row with the matching attendance ID
+        for i in range(len(mydata)):
+            if str(mydata[i][0]) == str(attendance_id):
+
+                # Found the row — update it with the new values from the form
+                mydata[i][1] = roll
+                mydata[i][2] = name
+                mydata[i][3] = dep
+                mydata[i][4] = time
+                mydata[i][5] = date
+                mydata[i][6] = attendance_status
+
+                # Refresh the table so the changes show up
+                self.fetchData(mydata)
+
+                # Show a success message and clear the form
+                messagebox.showinfo("Success", "Attendance record updated successfully.", parent=self.root)
+                self.reset_data()
+                return
+
+        # If we get here, no matching row was found
+        messagebox.showerror("Not Found", "Could not find the record to update.", parent=self.root)
 
 
 if __name__ == "__main__":
