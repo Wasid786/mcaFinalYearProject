@@ -231,11 +231,10 @@ class Student:
         btn_frame2 = Frame(class_Student_frame, bd=2, relief=RIDGE, bg="white")
         btn_frame2.grid(row=8, column=0, columnspan=4, sticky="nsew", padx=5, pady=5)
 
-        for i in range(2):
+        for i in range(1):
             btn_frame2.columnconfigure(i, weight=1)
 
         Button(btn_frame2, text="Take Photo Sample",command=self.generate_dataset,   font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=0, sticky="nsew")
-        Button(btn_frame2, text="Update Photo Sample", font=("times new roman", 13, "bold"), bg="blue", fg="white").grid(row=0, column=1, sticky="nsew")
 
         # ===== RIGHT FRAME: starts at 50% and takes remaining half =====
         right_x = left_width + (gap * 2)
