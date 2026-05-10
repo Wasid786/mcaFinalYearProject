@@ -55,6 +55,7 @@ class Weekly_Progress:
 
         # ── filter variables ──────────────────────────────────────────────────
         self.var_course = StringVar(value="All")
+        self.var_dep = StringVar(value="All")
         self.var_sem    = StringVar(value="All")
         self.var_year   = StringVar(value="All")
         self.var_search = StringVar()
@@ -81,7 +82,7 @@ class Weekly_Progress:
     def get_conn(self):
         return mysql.connector.connect(
             host="localhost", user="root",
-            password="YOUR_PASSWORD",
+            password="Wasid@5284mysql",
             database="face_recognizer",
         )
 
@@ -110,8 +111,8 @@ class Weekly_Progress:
             cur  = conn.cursor()
 
             cond, params = [], []
-            if self.var_course.get() != "All":
-                cond.append("course=%s");   params.append(self.var_course.get())
+            if self.var_dep.get() != "All":
+                cond.append("dep=%s");   params.append(self.var_dep.get())
             if self.var_sem.get() != "All":
                 cond.append("semester=%s"); params.append(self.var_sem.get())
             if self.var_year.get() != "All":
@@ -292,7 +293,7 @@ class Weekly_Progress:
 
         # Dropdowns
         items = [
-            ("Course:",   self.var_course, ["All", "FY", "SY", "TY"],                         0, 0),
+            ("Department:",   self.var_course, ["All", "MCA", "BCA", "Cyber"],                         0, 0),
             ("Semester:", self.var_sem,    ["All", "Sem 1", "Sem 2", "Sem 3", "Sem 4"],        0, 2),
             ("Year:",     self.var_year,   ["All", "2022-23", "2023-24", "2024-25", "2025-26"], 0, 4),
         ]
@@ -317,7 +318,7 @@ class Weekly_Progress:
         for col, (text, cmd, color) in enumerate([
             ("Apply",         self.load_students,  COLOR_HEADER),
             ("Reset",         self.reset_filters,  "#757575"),
-            ("💾 Save Marked", self.save_staged,   "#e65100"),
+            ("Save Marked", self.save_staged,   "#e65100"),
             ("Export CSV",    self.export_csv,     "#388e3c"),
         ], start=8):
             Button(
@@ -505,6 +506,7 @@ class Weekly_Progress:
 
     def reset_filters(self):
         self.var_course.set("All")
+        self.var_dep.set("All")
         self.var_sem.set("All")
         self.var_year.set("All")
         self.var_search.set("")

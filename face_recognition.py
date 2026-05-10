@@ -70,7 +70,7 @@ class Face_Recognition:
         return mysql.connector.connect(
             host="localhost",
             user="root",
-            password="YOUR_PASSWORD",
+            password="Wasid@5284mysql",
             database="face_recognizer",
         )
 
