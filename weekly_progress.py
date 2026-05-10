@@ -30,19 +30,22 @@ COLOR_HEADER = "#1a237e"   # dark blue    – title / header bar
 
 SQL_CREATE = """
 CREATE TABLE IF NOT EXISTS weekly_assignment (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    student_id  INT  NOT NULL,
-    week_number INT  NOT NULL,
-    course      VARCHAR(50),
-    semester    VARCHAR(50),
-    year        VARCHAR(20),
-    status      VARCHAR(20) DEFAULT 'Pending',
-    marked_on   DATETIME,
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    student_id   INT          NOT NULL,
+    student_name VARCHAR(100) NOT NULL,
+    week_number  INT          NOT NULL,
+    course       VARCHAR(50),
+    semester     VARCHAR(50),
+    year         VARCHAR(20),
+    status       VARCHAR(20) DEFAULT 'Pending',
+    marked_on    DATETIME,
     FOREIGN KEY (student_id) REFERENCES student(student_id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     UNIQUE KEY uq_std_week (student_id, week_number, course, semester, year)
 )
 """
+
+SQL_DROP_MONTH = "ALTER TABLE weekly_assignment DROP COLUMN month"
 
 
 class Weekly_Progress:
@@ -66,7 +69,8 @@ class Weekly_Progress:
         self.var_pct     = StringVar(value="0%")
 
         # data storage
-        self.assignment_data = {}   # {student_id: {week_number: "Done"|"Pending"}}
+        self.assignment_data = {}   # {student_id: {week_number: "Done"}}  – saved to DB
+        self.staged          = {}   # {student_id: set(week_numbers)}       – ticked but NOT saved yet
         self.student_rows    = []   # list of dicts
 
         self.ensure_table()
@@ -89,7 +93,14 @@ class Weekly_Progress:
         conn = None
         try:
             conn = self.get_conn()
-            conn.cursor().execute(SQL_CREATE)
+            cur  = conn.cursor()
+            cur.execute(SQL_CREATE)
+            # Drop the month column if it was added by an older version (error 1091 = column not found, safe to ignore)
+            try:
+                cur.execute(SQL_DROP_MONTH)
+            except mysql.connector.Error as drop_err:
+                if drop_err.errno != 1091:
+                    raise
             conn.commit()
         except Exception as e:
             messagebox.showerror("DB Error", str(e))
@@ -98,7 +109,7 @@ class Weekly_Progress:
                 conn.close()
 
     def load_students(self):
-        """Pull student list + their week statuses from DB, apply filters."""
+        """Pull student list + their saved Done statuses from DB, apply filters."""
         conn = None
         try:
             conn = self.get_conn()
@@ -130,12 +141,13 @@ class Weekly_Progress:
                 for r in rows
             ]
 
-            # load statuses for these students
+            # load only "Done" statuses (the only ones saved)
             if self.student_rows:
                 sids = tuple(s["id"] for s in self.student_rows)
                 ph = ",".join(["%s"] * len(sids))
                 cur.execute(
-                    f"SELECT student_id, week_number, status FROM weekly_assignment WHERE student_id IN ({ph})",
+                    f"SELECT student_id, week_number FROM weekly_assignment "
+                    f"WHERE student_id IN ({ph}) AND status='Done'",
                     sids # type: ignore
                 )
                 raw = cur.fetchall()
@@ -143,8 +155,11 @@ class Weekly_Progress:
                 raw = []
 
             self.assignment_data = {}
-            for (sid, week, status) in raw:
-                self.assignment_data.setdefault(sid, {})[week] = status
+            for (sid, week) in raw:
+                self.assignment_data.setdefault(sid, set()).add(week)
+
+            # clear any unsaved staging when reloading
+            self.staged = {}
 
         except Exception as e:
             messagebox.showerror("Error", str(e))
@@ -154,27 +169,74 @@ class Weekly_Progress:
 
         self.render_grid()
 
-    def toggle_week(self, student_id, week, course, sem, year):
-        """Flip a cell between Done and Pending, save to DB, redraw."""
-        current    = self.assignment_data.get(student_id, {}).get(week, "Pending")
-        new_status = "Done" if current != "Done" else "Pending"
+    def stage_week(self, student_id, week):
+        """
+        Clicking a blank cell stages it (yellow preview).
+        Clicking a staged cell un-stages it (only allowed before Save).
+        Clicking a saved Done cell does nothing at all.
+        """
+        # already saved to DB – locked, do nothing
+        if week in self.assignment_data.get(student_id, set()):
+            return
+
+        # toggle staging (pre-save)
+        staged_weeks = self.staged.setdefault(student_id, set())
+        if week in staged_weeks:
+            staged_weeks.discard(week)
+        else:
+            staged_weeks.add(week)
+
+        self.render_grid()
+
+    def save_staged(self):
+        """Save all staged (yellow) cells to DB as Done. Cannot be undone."""
+        # collect everything staged across all students
+        to_save = [
+            (s, w)
+            for s in self.student_rows
+            for w in self.staged.get(s["id"], set())
+        ]
+        if not to_save:
+            messagebox.showinfo("Nothing to save",
+                                "No new assignments are ticked.\nClick blank cells first, then press Save.",
+                                parent=self.root)
+            return
+
+        count = len(to_save)
+        confirm = messagebox.askyesno(
+            "Confirm Save",
+            f"You are about to mark {count} assignment(s) as Done.\n\nThis CANNOT be undone. Continue?",
+            parent=self.root
+        )
+        if not confirm:
+            return
 
         conn = None
         try:
             conn = self.get_conn()
             cur  = conn.cursor()
-            cur.execute("""
-                INSERT INTO weekly_assignment
-                    (student_id, week_number, course, semester, year, status, marked_on)
-                VALUES (%s,%s,%s,%s,%s,%s,%s)
-                ON DUPLICATE KEY UPDATE status=%s, marked_on=%s
-            """, (student_id, week, course, sem, year, new_status, datetime.now(),
-                  new_status, datetime.now()))
+            now  = datetime.now()
+
+            for s in self.student_rows:
+                sid = s["id"]
+                for w in self.staged.get(sid, set()):
+                    cur.execute("""
+                        INSERT INTO weekly_assignment
+                            (student_id, student_name, week_number, course, semester, year, status, marked_on)
+                        VALUES (%s, %s, %s, %s, %s, %s, 'Done', %s)
+                        ON DUPLICATE KEY UPDATE student_name=%s, status='Done', marked_on=%s
+                    """, (sid, s["name"], w, s["course"], s["sem"], s["year"], now,
+                              s["name"], now)) # type: ignore
+                    # move from staged → permanently done in memory
+                    self.assignment_data.setdefault(sid, set()).add(w)
+
             conn.commit()
-            self.assignment_data.setdefault(student_id, {})[week] = new_status
+            self.staged = {}   # clear all staging
+            messagebox.showinfo("Saved", f"{count} assignment(s) marked as Done and saved.", parent=self.root)
             self.render_grid()
+
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Save Error", str(e), parent=self.root)
         finally:
             if conn:
                 conn.close()
@@ -234,9 +296,10 @@ class Weekly_Progress:
         ttk.Entry(tf, textvariable=self.var_search, width=18, font=FONT_NORMAL
                   ).grid(row=0, column=7, padx=(0,8), sticky=W)
 
-        Button(tf, text="Apply",      command=self.load_students,  font=FONT_SMALL, bg=COLOR_HEADER, fg="white", relief=FLAT, padx=8).grid(row=0, column=8,  padx=3)
-        Button(tf, text="Reset",      command=self.reset_filters,  font=FONT_SMALL, bg="#757575",    fg="white", relief=FLAT, padx=8).grid(row=0, column=9,  padx=3)
-        Button(tf, text="Export CSV", command=self.export_csv,     font=FONT_SMALL, bg="#388e3c",    fg="white", relief=FLAT, padx=8).grid(row=0, column=10, padx=3)
+        Button(tf, text="Apply",        command=self.load_students,  font=FONT_SMALL, bg=COLOR_HEADER, fg="white", relief=FLAT, padx=8).grid(row=0, column=8,  padx=3)
+        Button(tf, text="Reset",        command=self.reset_filters,  font=FONT_SMALL, bg="#757575",    fg="white", relief=FLAT, padx=8).grid(row=0, column=9,  padx=3)
+        Button(tf, text="💾 Save Marked", command=self.save_staged,  font=FONT_SMALL, bg="#e65100",    fg="white", relief=FLAT, padx=8).grid(row=0, column=10, padx=3)
+        Button(tf, text="Export CSV",   command=self.export_csv,     font=FONT_SMALL, bg="#388e3c",    fg="white", relief=FLAT, padx=8).grid(row=0, column=11, padx=3)
 
     # ── summary strip ────────────────────────────────────────────────────────
     def build_summary(self, parent, w):
@@ -304,15 +367,16 @@ class Weekly_Progress:
             return
 
         for r_idx, s in enumerate(self.student_rows, start=1):
-            sid    = s["id"]
-            weeks  = self.assignment_data.get(sid, {})
-            done_n = sum(1 for w in range(1, WEEKS + 1) if weeks.get(w) == "Done")
-            bg_row = "#f5f5f5" if r_idx % 2 == 0 else "white"
+            sid        = s["id"]
+            done_weeks = self.assignment_data.get(sid, set())
+            stgd_weeks = self.staged.get(sid, set())
+            done_n     = len(done_weeks)
+            bg_row     = "#f5f5f5" if r_idx % 2 == 0 else "white"
 
-            Label(self.grid_frame, text=s["name"], font=FONT_BOLD,
+            Label(self.grid_frame, text=s["name"], font=FONT_BOLD, # type: ignore
                   bg=bg_row, anchor=W, padx=8
                   ).grid(row=r_idx, column=0, sticky="nsew", padx=1, pady=1)
-            Label(self.grid_frame, text=s["roll"], font=FONT_SMALL,
+            Label(self.grid_frame, text=s["roll"], font=FONT_SMALL, # type: ignore
                   bg=bg_row, fg="#555"
                   ).grid(row=r_idx, column=1, sticky="nsew", pady=1)
             Label(self.grid_frame, text=str(sid), font=FONT_SMALL,
@@ -320,17 +384,40 @@ class Weekly_Progress:
                   ).grid(row=r_idx, column=2, sticky="nsew", pady=1)
 
             for w in range(1, WEEKS + 1):
-                is_done = (weeks.get(w) == "Done")
-                Button(
-                    self.grid_frame,
-                    text="✓" if is_done else "",
-                    font=("times new roman", 11, "bold"),
-                    bg=COLOR_DONE if is_done else bg_row,
-                    fg="#2e7d32", relief=FLAT, bd=0, cursor="hand2",
-                    command=lambda _sid=sid, _w=w, _c=s["course"], _s=s["sem"], _y=s["year"]:
-                        self.toggle_week(_sid, _w, _c, _s, _y)
-                ).grid(row=r_idx, column=2 + w, sticky="nsew",
-                       ipadx=4, ipady=5, padx=1, pady=1)
+                if w in done_weeks:
+                    # ── LOCKED: saved to DB, cannot be clicked ────────
+                    Label(
+                        self.grid_frame,
+                        text="✓",
+                        font=("times new roman", 11, "bold"),
+                        bg="#c8e6c9", fg="#2e7d32",
+                        relief=FLAT
+                    ).grid(row=r_idx, column=2 + w, sticky="nsew",
+                           ipadx=4, ipady=5, padx=1, pady=1)
+
+                elif w in stgd_weeks:
+                    # ── STAGED: ticked but not yet saved (yellow) ─────
+                    Button(
+                        self.grid_frame,
+                        text="✓",
+                        font=("times new roman", 11, "bold"),
+                        bg="#fff9c4", fg="#f57f17",
+                        relief=FLAT, bd=0, cursor="hand2",
+                        command=lambda _sid=sid, _w=w: self.stage_week(_sid, _w)
+                    ).grid(row=r_idx, column=2 + w, sticky="nsew",
+                           ipadx=4, ipady=5, padx=1, pady=1)
+
+                else:
+                    # ── BLANK: pending, click to stage ────────────────
+                    Button(
+                        self.grid_frame,
+                        text="",
+                        font=("times new roman", 11, "bold"),
+                        bg=bg_row, fg="#2e7d32",
+                        relief=FLAT, bd=0, cursor="hand2",
+                        command=lambda _sid=sid, _w=w: self.stage_week(_sid, _w)
+                    ).grid(row=r_idx, column=2 + w, sticky="nsew",
+                           ipadx=4, ipady=5, padx=1, pady=1)
 
             Label(self.grid_frame,
                   text=f"{done_n} / {WEEKS}",
@@ -345,17 +432,15 @@ class Weekly_Progress:
 
     def update_summary(self, rows):
         total = len(rows) * WEEKS
-        done  = sum(
-            1 for s in rows
-            for w in range(1, WEEKS + 1)
-            if self.assignment_data.get(s["id"], {}).get(w) == "Done"
-        )
+        done  = sum(len(self.assignment_data.get(s["id"], set())) for s in rows)
         pending = total - done
         pct     = round(done / total * 100) if total else 0
         self.var_shown.set(str(len(rows)))
         self.var_done.set(str(done))
         self.var_pending.set(str(pending))
         self.var_pct.set(f"{pct}%")
+
+
 
     # =========================================================================
     #  FILTER / EXPORT
@@ -380,9 +465,9 @@ class Weekly_Progress:
                            [f"Week {i}" for i in range(1, WEEKS + 1)] + ["Total Done"])
                 for s in self.student_rows:
                     sid   = s["id"]
-                    wks   = self.assignment_data.get(sid, {})
-                    cells = [wks.get(i, "Pending") for i in range(1, WEEKS + 1)]
-                    done_n = cells.count("Done")
+                    done_weeks = self.assignment_data.get(sid, set())
+                    cells = ["Done" if i in done_weeks else "Pending" for i in range(1, WEEKS + 1)]
+                    done_n = len(done_weeks)
                     w.writerow([s["name"], s["roll"], sid, s["course"], s["sem"], s["year"]] + cells + [done_n])
             messagebox.showinfo("Exported", f"File saved:\n{path}", parent=self.root)
         except Exception as e:
