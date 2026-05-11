@@ -39,11 +39,11 @@ class Face_Recognition:
         panel_h = sh - 50          # full height minus title bar
         panel_w = sw // 2
 
-        self.photoimg01 = load_image(r"static\images\img01.jpg", panel_w, panel_h)
+        self.photoimg01 = load_image(r"static\images\face_left01.jpg", panel_w, panel_h)
         f_lb_1 = Label(self.root, image=self.photoimg01)
         f_lb_1.place(x=0, y=50, relwidth=0.5, height=panel_h)
 
-        self.photoimg02 = load_image(r"static\images\img02.jpg", panel_w, panel_h)
+        self.photoimg02 = load_image(r"static\images\face_right03.jpg", panel_w, panel_h)
         f_lb_2 = Label(self.root, image=self.photoimg02)
         f_lb_2.place(relx=0.5, y=50, relwidth=0.5, height=panel_h)
 
@@ -53,7 +53,7 @@ class Face_Recognition:
         btn_font = max(13,  int(sw * 0.012))
 
         Button(
-            f_lb_2, text="Face Recognition",
+            f_lb_2, text="Take Attendance",
             command=self.face_recog, cursor="hand2",
             font=("times new roman", btn_font, "bold"),
             bg="darkgreen", fg="white",

@@ -52,7 +52,7 @@ class Attendance:
 
         # ── Background below header ──────────────────────────────────────────
         bg_h = sh - hdr_h
-        self.photobg = load_image(r"static\images\img04.jpg", sw, bg_h)
+        self.photobg = load_image(r"static\images\attendance_left.jpg", sw, bg_h)
         bg_img = Label(self.root, image=self.photobg)
         bg_img.place(x=0, y=hdr_h, relwidth=1, height=bg_h)
 
@@ -100,7 +100,7 @@ class Attendance:
                 return
             img_w = w - 10
             img_h = max(10, int(h * 0.18))
-            img = Image.open(r"static\images\img05.jpg")
+            img = Image.open(r"static\images\attendance_left.jpg")
             img = img.resize((img_w, img_h), Image.Resampling.LANCZOS)
             self._left_photo = ImageTk.PhotoImage(img) # type: ignore
             self._left_img_lbl.config(image=self._left_photo, # type: ignore
@@ -217,7 +217,7 @@ class Attendance:
             w = Right_frame.winfo_width()
             if w < 10:
                 return
-            img = Image.open(r"static\images\img06.jpg")
+            img = Image.open(r"static\images\attendance_right.jpg")
             img = img.resize((w - 10, 130), Image.Resampling.LANCZOS)
             self._right_photo = ImageTk.PhotoImage(img) # type: ignore
             self._right_img_lbl.config(image=self._right_photo) # type: ignore

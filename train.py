@@ -34,12 +34,12 @@ class Train:
         # ── Two image panels (each half width, 40 % of screen height) ────────
         panel_h = int(sh * 0.40)
 
-        self.photoimg01 = load_image(r"static\images\img01.jpg", sw // 2, panel_h)
+        self.photoimg01 = load_image(r"static\images\train_01.jpg", sw // 2, panel_h)
         Label(self.root, image=self.photoimg01).place(
             x=0, y=50, relwidth=0.5, height=panel_h
         )
 
-        self.photoimg02 = load_image(r"static\images\img02.jpg", sw // 2, panel_h)
+        self.photoimg02 = load_image(r"static\images\train_02.jpg", sw // 2, panel_h)
         Label(self.root, image=self.photoimg02).place(
             relx=0.5, y=50, relwidth=0.5, height=panel_h
         )
@@ -69,12 +69,12 @@ class Train:
         row2_y = btn_y + btn_h
         row2_h = sh - row2_y   # fill whatever space is left
 
-        self.photoimg03 = load_image(r"static\images\img01.jpg", sw // 2, max(1, row2_h))
+        self.photoimg03 = load_image(r"static\images\train_03.jpg", sw // 2, max(1, row2_h))
         Label(self.root, image=self.photoimg03).place(
             x=0, y=row2_y, relwidth=0.5, height=row2_h
         )
 
-        self.photoimg04 = load_image(r"static\images\img02.jpg", sw // 2, max(1, row2_h))
+        self.photoimg04 = load_image(r"static\images\train_04.jpg", sw // 2, max(1, row2_h))
         Label(self.root, image=self.photoimg04).place(
             relx=0.5, y=row2_y, relwidth=0.5, height=row2_h
         )
