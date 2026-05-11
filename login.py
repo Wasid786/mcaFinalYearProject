@@ -147,7 +147,7 @@ class Login_Window:
         try:
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(
@@ -156,7 +156,7 @@ class Login_Window:
             row = conn.close() or cursor.fetchone()  # close before checking
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(
@@ -283,7 +283,7 @@ class Login_Window:
         try:
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(
@@ -326,7 +326,7 @@ class Login_Window:
 
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(

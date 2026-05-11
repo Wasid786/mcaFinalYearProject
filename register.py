@@ -257,7 +257,7 @@ class Register:
         try:
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(
@@ -299,7 +299,7 @@ class Register:
 
             conn = mysql.connector.connect(
                 host="localhost", user="root",
-                password="YOUR_PASSWORD", database="register",
+                password="Wasid@5284mysql", database="register",
             )
             cursor = conn.cursor()
             cursor.execute(
