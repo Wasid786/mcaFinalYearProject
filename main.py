@@ -1,3 +1,4 @@
+import cmath
 from time import strftime
 from tkinter import *
 import tkinter
@@ -9,6 +10,7 @@ import os
 from train import Train
 from face_recognition import Face_Recognition
 from attendance import Attendance
+from help_desk import Help_Desk
 
 
 class Face_recognition_System:
@@ -115,7 +117,7 @@ class Face_recognition_System:
         create_button(r"static\images\main_student.jpg", "Student Details", x_positions[0], y_top,    command=self.student_details)
         create_button(r"static\images\main_face.jpg", "Face Detection",  x_positions[1], y_top,    command=self.face_data)
         create_button(r"static\images\main_attendance.jpg", "Attendance",      x_positions[2], y_top,    command=self.attendance_data)
-        create_button(r"static\images\main_help.jpg", "Help Desk",       x_positions[3], y_top)
+        create_button(r"static\images\main_help.jpg", "Help Desk",       x_positions[3], y_top, command=self.help_desk_window)
 
         # Row 2
         create_button(r"static\images\main_train.jpg", "Train Data",       x_positions[0], y_bottom, command=self.train_data)
@@ -148,6 +150,10 @@ class Face_recognition_System:
     def weekly_progress(self):
         self.new_window = Toplevel(self.root)
         Weekly_Progress(self.new_window)
+
+    def help_desk_window(self):
+        self.new_window = Toplevel(self.root)
+        Help_Desk(self.new_window)
 
     def exit_func(self):
         if messagebox.askyesno("Face Recognition", "Exit the application?"):
